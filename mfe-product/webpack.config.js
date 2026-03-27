@@ -6,7 +6,7 @@ module.exports = {
   entry: './src/index.js',
   mode: 'development',
   devServer: {
-    port: 3003,
+    port: 3001,
     historyApiFallback: true,
     headers: { 'Access-Control-Allow-Origin': '*' },
   },
@@ -36,7 +36,7 @@ module.exports = {
   },
   plugins: [
     new ModuleFederationPlugin({
-      // TODO: configurer ce MFE pour exposer le composant Recommendations
+      // TODO: configurer ce MFE pour exposer le composant ProductGrid
     }),
     new HtmlWebpackPlugin({
       template: './public/index.html',
