@@ -2,9 +2,9 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import eventBus from 'shared/eventBus';
 import './App.css';
 
-const ProductApp = lazy(() => import('mfe-product/App'));
-const CartApp = lazy(() => import('mfe-cart/App'));
-const RecoApp = lazy(() => import('mfe-reco/App'));
+const ProductApp = lazy(() => import('mfeProduct/Product'));
+const CartApp = lazy(() => import('mfeCart/Cart'));
+const RecoApp = lazy(() => import('mfeReco/Reco'));
 
 function LoadingFallback({ name }) {
   return <div className="loading-fallback">Chargement {name}...</div>;

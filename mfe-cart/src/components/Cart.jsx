@@ -5,42 +5,65 @@ import './Cart.css';
 function Cart() {
   const [items, setItems] = useState([]);
 
-  const total = items.reduce((sum, item) => sum + item.price, 0);
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
- 
   useEffect(() => {
-    const unsubscribe = eventBus.on("product:add", (product) => {
-      const cartItem = {
-        ...product,
-        cartId: Date.now() // id unique pour le panier
-      };
+    const unsubscribe = eventBus.on("PRODUCT_ADDED_TO_CART", (product) => {
+      setItems(prev => {
+        const existing = prev.find(item => item.id === product.id);
+        
+        let newCart;
+        if (existing) {
+          newCart = prev.map(item =>
+            item.id === product.id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          );
+        } else {
+          newCart = [...prev, { ...product, cartId: Date.now() }];
+        }
 
-      setItems(prev => [...prev, cartItem]);
+        eventBus.emit('CART_UPDATED', {
+          totalItems: newCart.reduce((sum, item) => sum + item.quantity, 0),
+          totalPrice: newCart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+          items: newCart
+        });
+
+        return newCart;
+      });
     });
 
     return () => unsubscribe();
   }, []);
 
-  
-  useEffect(() => {
-    eventBus.emit("cart:updated", {
-      items,
-      total
-    });
-  }, [items, total]);
-
   const handleRemove = (cartId) => {
-    setItems(prev => prev.filter(item => item.cartId !== cartId));
+    setItems(prev => {
+      const newCart = prev.filter(item => item.cartId !== cartId);
+      
+      // Émettre CART_UPDATED après suppression
+      eventBus.emit('CART_UPDATED', {
+        totalItems: newCart.reduce((sum, item) => sum + item.quantity, 0),
+        totalPrice: newCart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+        items: newCart
+      });
+
+      return newCart;
+    });
   };
 
   const handleClear = () => {
     setItems([]);
-    eventBus.emit("cart:cleared", {});
+    eventBus.emit("CART_CLEARED", null);
+    eventBus.emit('CART_UPDATED', {
+      totalItems: 0,
+      totalPrice: 0,
+      items: []
+    });
   };
 
   return (
     <div className="cart">
-      <h2>Panier ({items.length})</h2>
+      <h2>Panier ({items.reduce((sum, item) => sum + item.quantity, 0)})</h2>
 
       {items.length === 0 ? (
         <p className="empty">Panier vide</p>
@@ -49,8 +72,10 @@ function Cart() {
           <ul className="cart-items">
             {items.map(item => (
               <li key={item.cartId} className="cart-item">
-                <span className="item-name">{item.name}</span>
-                <span className="item-price">{item.price} EUR</span>
+                <span className="item-name">
+                  {item.name} {item.quantity > 1 && `(x${item.quantity})`}
+                </span>
+                <span className="item-price">{item.price * item.quantity} EUR</span>
                 <button
                   className="remove-btn"
                   onClick={() => handleRemove(item.cartId)}
@@ -62,7 +87,7 @@ function Cart() {
           </ul>
 
           <div className="cart-footer">
-            <div className="cart-total">Total : {total} EUR</div>
+            <div className="cart-total">Total : {total.toFixed(2)} EUR</div>
             <button className="clear-btn" onClick={handleClear}>
               Vider le panier
             </button>
