@@ -4,6 +4,10 @@ function LoadingFallback({ name }) {
   return <div className="loading-fallback">Chargement {name}...</div>;
 }
 
+function OfflineFallback({ name }) {
+  return <div>Indisponible {name}</div>;
+}
+
 function RemoteMFE({ name, importFn }) {
   const [Component, setComponent] = useState(null);
   const [error, setError] = useState(false);
