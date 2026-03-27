@@ -4,7 +4,18 @@ import './App.css';
 
 const ProductApp = lazy(() => import('mfeProduct/Product'));
 const CartApp = lazy(() => import('mfeCart/Cart'));
-const RecoApp = lazy(() => import('mfeReco/Reco'));
+
+const RecoApp = lazy(() => 
+  import('mfeReco/Reco').catch(() => {
+    return { 
+      default: () => (
+        <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+          Recommandations temporairement indisponibles
+        </div>
+      )
+    };
+  })
+);
 
 function LoadingFallback({ name }) {
   return <div className="loading-fallback">Chargement {name}...</div>;

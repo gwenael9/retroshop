@@ -40,7 +40,6 @@ function Cart() {
     setItems(prev => {
       const newCart = prev.filter(item => item.cartId !== cartId);
       
-      // Émettre CART_UPDATED après suppression
       eventBus.emit('CART_UPDATED', {
         totalItems: newCart.reduce((sum, item) => sum + item.quantity, 0),
         totalPrice: newCart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
