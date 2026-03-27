@@ -1,20 +1,20 @@
-const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { ModuleFederationPlugin } = require('webpack').container;
+const path = require('path');
 
 module.exports = {
   entry: './src/index.js',
-  mode: 'development',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].[contenthash].js',
+    publicPath: 'http://localhost:3000/',
+    clean: true,
+  },
   devServer: {
-    port: 3003,
+    port: 3000,
+    hot: true,
     historyApiFallback: true,
     headers: { 'Access-Control-Allow-Origin': '*' },
-  },
-  resolve: {
-    extensions: ['.js', '.jsx'],
-    alias: {
-      'shared': path.resolve(__dirname, '../shared'),
-    },
   },
   module: {
     rules: [
@@ -34,12 +34,22 @@ module.exports = {
       },
     ],
   },
+  resolve: {
+    extensions: ['.js', '.jsx'],
+    alias: {
+      shared: path.resolve(__dirname, '../shared'),
+    },
+  },
   plugins: [
     new ModuleFederationPlugin({
-      // TODO: configurer ce MFE pour exposer le composant Recommendations
+      name: 'shell',
+      // TODO: declarer les 3 MFEs comme remotes
+      remotes: {},
+      shared: {
+        react: { singleton: true, requiredVersion: '^18.2.0' },
+        'react-dom': { singleton: true, requiredVersion: '^18.2.0' },
+      },
     }),
-    new HtmlWebpackPlugin({
-      template: './public/index.html',
-    }),
+    new HtmlWebpackPlugin({ template: './public/index.html' }),
   ],
 };

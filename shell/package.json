@@ -1,6 +1,7 @@
 {
-  "name": "mfe-reco",
+  "name": "retroshop-shell",
   "version": "1.0.0",
+  "description": "RetroShop - Shell orchestrateur",
   "scripts": {
     "start": "webpack serve --mode development",
     "build": "webpack --mode production"
