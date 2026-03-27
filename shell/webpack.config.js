@@ -43,8 +43,11 @@ module.exports = {
   plugins: [
     new ModuleFederationPlugin({
       name: 'shell',
-      // TODO: declarer les 3 MFEs comme remotes
-      remotes: {},
+      remotes: {
+        'mfe-product': 'mfe_product@http://localhost:3001/remoteEntry.js',
+        'mfe-cart': 'mfe_cart@http://localhost:3002/remoteEntry.js',
+        'mfe-reco': 'mfe_reco@http://localhost:3003/remoteEntry.js',
+      },
       shared: {
         react: { singleton: true, requiredVersion: '^18.2.0' },
         'react-dom': { singleton: true, requiredVersion: '^18.2.0' },
