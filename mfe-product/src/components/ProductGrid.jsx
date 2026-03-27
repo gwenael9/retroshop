@@ -20,8 +20,14 @@ function ProductCard({ product, onAdd }) {
 
 function ProductGrid() {
   const handleAdd = (product) => {
-    // TODO: notifier le reste de l'application qu'un produit a ete ajoute
-  };
+  eventBus.emit('PRODUCT_ADDED_TO_CART', {
+    id: product.id,
+    name: product.name,
+    price: product.price,
+    image: product.image,
+    quantity: 1
+  });
+};
 
   return (
     <div className="product-grid">
