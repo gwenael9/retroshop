@@ -7,13 +7,27 @@ function Cart() {
 
   const total = items.reduce((sum, item) => sum + item.price, 0);
 
+ 
   useEffect(() => {
-    // TODO: ecouter les ajouts de produits et mettre a jour le state
+    const unsubscribe = eventBus.on("product:add", (product) => {
+      const cartItem = {
+        ...product,
+        cartId: Date.now() // id unique pour le panier
+      };
+
+      setItems(prev => [...prev, cartItem]);
+    });
+
+    return () => unsubscribe();
   }, []);
 
+  
   useEffect(() => {
-    // TODO: notifier le reste de l'application quand le panier change
-  }, [items]);
+    eventBus.emit("cart:updated", {
+      items,
+      total
+    });
+  }, [items, total]);
 
   const handleRemove = (cartId) => {
     setItems(prev => prev.filter(item => item.cartId !== cartId));
@@ -21,11 +35,13 @@ function Cart() {
 
   const handleClear = () => {
     setItems([]);
+    eventBus.emit("cart:cleared", {});
   };
 
   return (
     <div className="cart">
       <h2>Panier ({items.length})</h2>
+
       {items.length === 0 ? (
         <p className="empty">Panier vide</p>
       ) : (
@@ -35,13 +51,21 @@ function Cart() {
               <li key={item.cartId} className="cart-item">
                 <span className="item-name">{item.name}</span>
                 <span className="item-price">{item.price} EUR</span>
-                <button className="remove-btn" onClick={() => handleRemove(item.cartId)}>x</button>
+                <button
+                  className="remove-btn"
+                  onClick={() => handleRemove(item.cartId)}
+                >
+                  x
+                </button>
               </li>
             ))}
           </ul>
+
           <div className="cart-footer">
             <div className="cart-total">Total : {total} EUR</div>
-            <button className="clear-btn" onClick={handleClear}>Vider le panier</button>
+            <button className="clear-btn" onClick={handleClear}>
+              Vider le panier
+            </button>
           </div>
         </>
       )}
