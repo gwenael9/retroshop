@@ -15,6 +15,7 @@ module.exports = {
     hot: true,
     historyApiFallback: true,
     headers: { 'Access-Control-Allow-Origin': '*' },
+    overlay: false
   },
   module: {
     rules: [
