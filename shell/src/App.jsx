@@ -1,31 +1,13 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
-import eventBus from 'shared/eventBus';
-import './App.css';
-
-const ProductApp = lazy(() => import('mfeProduct/Product'));
-const CartApp = lazy(() => import('mfeCart/Cart'));
-
-const RecoApp = lazy(() => 
-  import('mfeReco/Reco').catch(() => {
-    return { 
-      default: () => (
-        <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
-          Recommandations temporairement indisponibles
-        </div>
-      )
-    };
-  })
-);
-
-function LoadingFallback({ name }) {
-  return <div className="loading-fallback">Chargement {name}...</div>;
-}
+import React, { useState, useEffect, Suspense, lazy } from "react";
+import eventBus from "shared/eventBus";
+import "./App.css";
+import RemoteMFE from "./components/RemoteMFE";
 
 function App() {
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
-    const unsubscribe = eventBus.on('CART_UPDATED', (payload) => {
+    const unsubscribe = eventBus.on("CART_UPDATED", (payload) => {
       setCartCount(payload?.totalItems ?? 0);
     });
     return unsubscribe;
@@ -39,20 +21,17 @@ function App() {
       </header>
       <main className="shell-main">
         <section className="product-area">
-          <Suspense fallback={<LoadingFallback name="Products" />}>
-            <ProductApp />
-          </Suspense>
+          <RemoteMFE
+            name="Products"
+            importFn={() => import("mfeProduct/Product")}
+          />
         </section>
         <aside className="cart-area">
-          <Suspense fallback={<LoadingFallback name="Cart" />}>
-            <CartApp />
-          </Suspense>
+          <RemoteMFE name="Cart" importFn={() => import("mfeCart/Cart")} />
         </aside>
       </main>
       <section className="reco-area">
-        <Suspense fallback={<LoadingFallback name="Recommendations" />}>
-          <RecoApp />
-        </Suspense>
+        <RemoteMFE name="Reco" importFn={() => import("mfeReco/Reco")} />
       </section>
     </div>
   );
