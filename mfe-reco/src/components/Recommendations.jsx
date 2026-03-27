@@ -7,18 +7,22 @@ function Recommendations() {
   const [recos, setRecos] = useState(PRODUCTS.slice(0, 3));
 
   useEffect(() => {
-    // TODO: adapter les recommandations en fonction du contenu du panier
-    const unsubscribe = eventBus.on("CART_UPDATED", (payload) => {
+    const unsubscribeCartUpdated = eventBus.on("CART_UPDATED", (payload) => {
       const cartProductIds = payload.items.map((item) => item.id);
-
-      setRecos(recos.filter((p) => !cartProductIds.includes(p.id)));
+      setRecos(PRODUCTS.filter((p) => !cartProductIds.includes(p.id)).slice(0, 3));
     });
 
-    return unsubscribe;
+    const unsubscribeCartCleared = eventBus.on("CART_CLEARED", () => {
+      setRecos(PRODUCTS.slice(0, 3));
+    });
+
+    return () => {
+      unsubscribeCartUpdated();
+      unsubscribeCartCleared();
+    };
   }, []);
 
   const handleAddReco = (product) => {
-    // TODO: ajouter ce produit au panier (meme evenement que ProductGrid)
     eventBus.emit("PRODUCT_ADDED_TO_CART", {
       id: product.id,
       name: product.name,
